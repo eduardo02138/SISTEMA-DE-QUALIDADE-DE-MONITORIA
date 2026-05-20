@@ -1,108 +1,63 @@
-# Gemini Audio QA
+# ⚡ Telecom QA - Sistema de Qualidade de Monitoria
 
-Este script faz upload de um arquivo de áudio para o Gemini, solicita uma auditoria de QA focada em vendas e calcula uma nota final usando uma regra de scorecard orientada à conversão.
+Sistema inteligente de auditoria e monitoria de qualidade para operações de telecomunicações, utilizando a potência da IA do **Google Gemini** para transformar áudios de chamadas em dados estruturados e insights acionáveis.
 
-## Requisitos
+---
 
-- Python 3.11+ ou equivalente
-- `google-genai` instalado
+## 📊 Painel Interativo (Dashboard Premium)
 
-### Instalação
+O projeto conta com um **Painel Interativo** moderno e intuitivo desenvolvido em Streamlit, projetado para oferecer uma experiência de auditoria de alto nível.
 
-```bash
-pip install google-genai pandas openpyxl
-```
+### ✨ Diferenciais do Painel:
+- **Estética Glassmorphism:** Interface escura com efeitos de transparência e desfoque, proporcionando um visual premium e profissional.
+- **Navegação Estilo YouTube:** Menu lateral robusto e fluido para alternar rapidamente entre a visão geral e os relatórios individuais.
+- **Auditoria em Tempo Real:** Aba dedicada para upload e processamento imediato de novos áudios via API do Gemini.
+- **Transcrição Literal (Ipsis Litteris):** Visualização de diálogos palavra por palavra, garantindo que nenhum detalhe da ligação seja perdido.
+- **KPIs Visuais:** Gráficos interativos (Plotly) que mostram a aderência aos scripts, sentimento do cliente e eficácia de vendas.
 
-> Observação: `google-generativeai` está obsoleto. Use `google-genai` para novos projetos.
+---
 
-## Uso
+## 🚀 Funcionalidades Principais
 
-```bash
-python gemini_audio_qa.py caminho/para/chamada.mp3 --api-key SUA_API_KEY
-```
+1.  **Auditoria Automatizada:** O sistema ouve o áudio e preenche automaticamente um checklist de conformidade (saudação, sondagem, oferta, contra-argumentação).
+2.  **Análise de Sentimento:** Identifica se o cliente terminou a ligação Satisfeito, Neutro ou Irritado.
+3.  **Resiliência API:** Mecanismo de retentativa automática (retry) para lidar com picos de demanda da API (Erro 503).
+4.  **Processamento em Lote:** Script de orquestração para processar centenas de áudios de uma só vez.
+5.  **Extração de Dados:** Identificação automática de nomes, telefones e endereços mencionados durante a chamada.
 
-### Opções úteis
+---
 
-- `--model gemini-3`
-- `--api-base URL_DO_PROXY` para usar OpenClaw ou proxy
-- `--output-json resultado.json` para gravar o payload final
-- `--no-cleanup` para manter o arquivo de áudio no servidor do Gemini
-- `--max-poll-seconds 180` para aumentar o timeout de processamento
+## 🛠️ Tecnologias Utilizadas
 
-## O que o script faz
+- **Linguagem:** Python 3.12+
+- **IA:** Google Gemini (via `google-genai`)
+- **Interface:** Streamlit
+- **Gráficos:** Plotly Express
+- **Processamento de Áudio:** FFmpeg & Mutagen
+- **Dados:** Pandas
 
-1. Faz upload do arquivo de áudio para o Gemini
-2. Aguarda processamento do arquivo
-3. Envia áudio + prompt de auditoria de vendas para gerar JSON estruturado
-4. Valida as chaves do contrato de vendas
-5. Calcula a nota final usando pesos focados em sondagem, oferta e contra-argumentação
-6. Exibe o payload final
+---
 
-## Saída
+## ⚙️ Como Iniciar o Painel
 
-O script retorna um JSON com:
+1.  Instale as dependências:
+    ```bash
+    pip install -r requirements.txt
+    ```
+2.  Inicie o Dashboard:
+    ```bash
+    streamlit run frontend/dashboard.py
+    ```
+3.  No navegador, insira sua **Chave de API do Gemini** na aba "Auditar Novo Áudio" e comece a auditoria!
 
-- `audio_path`
-- `raw_ia_data`
-- `scorecard`
-  - `status_processamento`
-  - `nota_final`
-  - `classificacao`
-  - `detalhamento`
-  - `performance_sondagem_negociacao`
-  - `resumo_objecoes_cliente`
-  - `motivo_avaliacao`
+---
 
-## Contrato de dados esperado
+## 📁 Estrutura do Repositório
 
-O Gemini deve retornar um JSON com as chaves exatas:
+- `frontend/dashboard.py`: Código fonte da interface visual.
+- `gemini_audio_qa.py`: Motor de inteligência e integração com Gemini.
+- `orquestrador_lote.py`: Script para processamento massivo de arquivos.
+- `relatorio/`: Pasta onde os resultados e transcrições são salvos.
 
-- `saudacao_padrao_claro`
-- `coleta_dados_pessoais`
-- `coleta_endereco_completo`
-- `fez_sondagem_necessidades`
-- `oferta_completa_produtos`
-- `aplicou_contra_argumentacao`
-- `ofensa_ao_cliente`
-- `falha_viabilidade_tecnica`
-- `analise_sentimento_cliente`
-- `resumo_objecoes_cliente`
-- `motivo_avaliacao`
-
-## Foco do scoring
-
-O scorecard pesa fortemente:
-
-- sondagem de necessidades
-- oferta completa de produtos
-- contra-argumentação do atendente
-
-Penalidades críticas ocorrem quando há ofensa ao cliente ou falha de viabilidade técnica.
-
-## Orquestrador em lote
-
-Para rodar em escala diária e gerar relatórios BI, use `orquestrador_lote.py` junto com `gemini_audio_qa.py`.
-
-### Dependências adicionais
-
-- `pandas`
-- `openpyxl` (opcional, para exportar XLSX)
-
-```bash
-pip install pandas openpyxl
-```
-
-### Uso em lote
-
-```bash
-python orquestrador_lote.py --audio-dir ./audios_para_auditoria --output-csv relatorio_consolidado_qa.csv --output-xlsx relatorio_consolidado_qa.xlsx --api-key SUA_CHAVE_API_AQUI
-```
-
-Se preferir, defina a variável de ambiente `GOOGLE_API_KEY` e não use `--api-key`.
-
-### Modelo de operação
-
-- O orquestrador varre `./audios_para_auditoria` em busca de MP3/WAV/M4A
-- Cada áudio é processado com tolerância a falhas, mantendo o loop mesmo que um arquivo falhe
-- O resultado é consolidado em um DataFrame do Pandas
-- A saída é exportada como CSV e, opcionalmente, XLSX para análise BI
+---
+*Desenvolvido para elevar o padrão de qualidade em monitorias de telecomunicações.*
