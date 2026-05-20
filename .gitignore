@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Streamlit
+.streamlit/
+
+# Reports and Audios
+relatorio/
+temp_audios/
+audios_para_auditoria/
+relatorio_consolidado_qa.csv
+relatorio_consolidado_qa.xlsx
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
